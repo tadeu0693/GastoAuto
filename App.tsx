@@ -6,7 +6,7 @@ import {
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { NotifCapture } from './modules/notif-capture/src/NotifCaptureModule';
-import { addItem, getMeta, CATEGORIES, deleteTx, items as listItems, listMonth, NEUTRAL, removeItem, setCategory, Tx } from './src/db';
+import { addItem, getMeta, getBalances, Balance, CATEGORIES, deleteTx, items as listItems, listMonth, NEUTRAL, removeItem, setCategory, Tx } from './src/db';
 import { syncAll } from './src/sync';
 import { api } from './src/api';
 import { registerBackground } from './src/background';
@@ -35,7 +35,11 @@ function App() {
   const [txs, setTxs] = useState<Tx[]>([]);
   const [syncing, setSyncing] = useState(false);
 
-  const load = useCallback(async () => setTxs(await listMonth(ymOf(month))), [month]);
+  const [balances, setBalances] = useState<{ list: Balance[]; at: string | null }>({ list: [], at: null });
+  const load = useCallback(async () => {
+    setTxs(await listMonth(ymOf(month)));
+    setBalances(await getBalances());
+  }, [month]);
 
   const sync = useCallback(async (silent = false) => {
     setSyncing(true);
@@ -76,7 +80,7 @@ function App() {
       </View>
 
       <View style={{ flex: 1 }}>
-        {tab === 'resumo' && <Resumo txs={txs} onRefresh={() => sync()} syncing={syncing} />}
+        {tab === 'resumo' && <Resumo txs={txs} balances={balances} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'lanc' && <Lancamentos txs={txs} onChange={load} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'ajustes' && <Ajustes onConnected={() => sync()} />}
       </View>
@@ -92,7 +96,7 @@ function App() {
   );
 }
 
-function Resumo({ txs, onRefresh, syncing }: { txs: Tx[]; onRefresh: () => void; syncing: boolean }) {
+function Resumo({ txs, balances, onRefresh, syncing }: { txs: Tx[]; balances: { list: Balance[]; at: string | null }; onRefresh: () => void; syncing: boolean }) {
   const { gastos, receitas, porCat } = useMemo(() => {
     let gastos = 0, receitas = 0;
     const porCat: Record<string, number> = {};
@@ -108,12 +112,34 @@ function Resumo({ txs, onRefresh, syncing }: { txs: Tx[]; onRefresh: () => void;
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}
       refreshControl={<RefreshControl refreshing={syncing} onRefresh={onRefresh} tintColor={C.accent} />}>
+      {balances.list.length > 0 && (
+        <View style={s.card}>
+          <Text style={s.dim}>Saldo nas contas</Text>
+          {(() => {
+            const bank = balances.list.filter(b => b.type !== 'CREDIT');
+            const total = bank.reduce((a, b) => a + (b.balance ?? 0), 0);
+            return <Text style={[s.big, { color: total >= 0 ? C.green : C.red }]}>{brl(total)}</Text>;
+          })()}
+          {balances.list.map(b => (
+            <View key={b.id} style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+              <Text style={[s.txt, { flex: 1 }]} numberOfLines={1}>{b.type === 'CREDIT' ? '💳 ' : '🏦 '}{b.name}</Text>
+              {b.type === 'CREDIT'
+                ? <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={[s.txt, { color: C.red }]}>Fatura {brl(b.balance ?? 0)}</Text>
+                    {b.available != null && <Text style={s.dim}>Disponível {brl(b.available)}</Text>}
+                  </View>
+                : <Text style={[s.txt, { color: (b.balance ?? 0) >= 0 ? C.green : C.red }]}>{brl(b.balance ?? 0)}</Text>}
+            </View>
+          ))}
+          {balances.at && <Text style={[s.dim, { marginTop: 8 }]}>Atualizado pelo banco em {new Date(balances.at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</Text>}
+        </View>
+      )}
       <View style={s.card}>
         <Text style={s.dim}>Gastos do mês</Text>
         <Text style={[s.big, { color: C.red }]}>{brl(gastos)}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
           <View><Text style={s.dim}>Receitas</Text><Text style={[s.mid, { color: C.green }]}>{brl(receitas)}</Text></View>
-          <View style={{ alignItems: 'flex-end' }}><Text style={s.dim}>Saldo</Text>
+          <View style={{ alignItems: 'flex-end' }}><Text style={s.dim}>Resultado do mês</Text>
             <Text style={[s.mid, { color: receitas - gastos >= 0 ? C.green : C.red }]}>{brl(receitas - gastos)}</Text></View>
         </View>
       </View>

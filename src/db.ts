@@ -102,5 +102,20 @@ export async function addItem(id: string, name: string) {
   await (await db()).runAsync('INSERT OR REPLACE INTO items(id,name) VALUES(?,?)', id, name);
 }
 export async function removeItem(id: string) {
-  await (await db()).runAsync('DELETE FROM items WHERE id=?', id);
+  const d = await db();
+  await d.runAsync('DELETE FROM items WHERE id=?', id);
+  await d.runAsync(`DELETE FROM meta WHERE key IN (?,?,?)`, `balances:${id}`, `status:${id}`, `lastSync2:${id}`);
+}
+
+export type Balance = { id: string; name: string; type: string; balance: number | null; creditLimit: number | null; available: number | null; dueDate: string | null };
+
+// Saldos mais recentes de todas as contas conectadas
+export async function getBalances(): Promise<{ list: Balance[]; at: string | null }> {
+  const rows = await (await db()).getAllAsync<{ value: string }>(`SELECT value FROM meta WHERE key LIKE 'balances:%'`);
+  const list: Balance[] = [];
+  let at: string | null = null;
+  for (const r of rows) {
+    try { const v = JSON.parse(r.value); list.push(...(v.list ?? [])); if (v.at && (!at || v.at > at)) at = v.at; } catch {}
+  }
+  return { list, at };
 }

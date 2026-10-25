@@ -101,6 +101,7 @@ export async function syncOpenFinance(): Promise<{ count: number; errors: string
     for (const st of r.items ?? []) {
       statuses.push(st);
       await setMeta(`status:${st.id}`, JSON.stringify(st));
+      if ((st as any).balances) await setMeta(`balances:${st.id}`, JSON.stringify({ at: st.lastUpdatedAt, list: (st as any).balances }));
     }
   }
   const d = await db();

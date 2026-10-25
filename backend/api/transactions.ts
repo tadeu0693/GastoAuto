@@ -21,6 +21,13 @@ export async function POST(req: Request) {
       const { results: accounts = [] } = await pluggy(`/accounts?itemId=${itemId}`);
       info.accounts = accounts.length;
       info.accountNames = accounts.map((a: any) => `${a.name} (${a.type})`);
+      info.balances = accounts.map((a: any) => ({
+        id: a.id, name: (a.marketingName || a.name || '').trim(), type: a.type, subtype: a.subtype,
+        balance: a.balance ?? null,
+        creditLimit: a.creditData?.creditLimit ?? null,
+        available: a.creditData?.availableCreditLimit ?? null,
+        dueDate: a.creditData?.balanceDueDate ?? null,
+      }));
       for (const acc of accounts) {
         // API v2 (cursor): /v2/transactions?accountId=&dateFrom= ; segue `next` até acabar
         let path: string | null = `/v2/transactions?${new URLSearchParams({ accountId: acc.id, dateFrom: from })}`;
