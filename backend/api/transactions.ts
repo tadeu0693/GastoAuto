@@ -22,11 +22,11 @@ export async function POST(req: Request) {
       info.accounts = accounts.length;
       info.accountNames = accounts.map((a: any) => `${a.name} (${a.type})`);
       for (const acc of accounts) {
-        let page = 1, totalPages = 1;
-        do {
-          const q = new URLSearchParams({ accountId: acc.id, from, pageSize: '500', page: String(page) });
-          const d = await pluggy(`/transactions?${q}`);
-          totalPages = d.totalPages ?? 1;
+        // API v2 (cursor): /v2/transactions?accountId=&dateFrom= ; segue `next` até acabar
+        let path: string | null = `/v2/transactions?${new URLSearchParams({ accountId: acc.id, dateFrom: from })}`;
+        let guard = 0;
+        while (path && guard++ < 50) {
+          const d: any = await pluggy(path);
           for (const t of d.results ?? []) {
             const isCard = acc.type === 'CREDIT';
             // Conta: valor negativo = saída. Cartão: valor positivo = compra.
@@ -43,8 +43,15 @@ export async function POST(req: Request) {
             });
             info.transactions++;
           }
-          page++;
-        } while (page <= totalPages);
+          if (!d.next) { path = null; break; }
+          const n = new URL(d.next, 'https://api.pluggy.ai');
+          if (!n.pathname.includes('transactions')) {
+            n.pathname = '/v2/transactions';
+            if (!n.searchParams.get('accountId')) n.searchParams.set('accountId', acc.id);
+            if (!n.searchParams.get('dateFrom')) n.searchParams.set('dateFrom', from);
+          }
+          path = n.pathname + n.search;
+        }
       }
     } catch (e: any) {
       errors.push(`${itemId}: ${e.message}`);
