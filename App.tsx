@@ -176,6 +176,7 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
   const [known, setKnown] = useState<string[]>([]);
   const [its, setIts] = useState<{ id: string; name: string }[]>([]);
   const [token, setToken] = useState<string | null>(null);
+  const [connectorId, setConnectorId] = useState<number | null>(null);
 
   const refresh = useCallback(async () => {
     setPerm(NotifCapture.hasPermission());
@@ -202,8 +203,9 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
     setOpening(true);
     try {
       if (!PluggyConnect) PluggyConnect = require('react-native-pluggy-connect').PluggyConnect;
-      const { accessToken } = await api<{ accessToken: string }>('connect-token', {});
+      const { accessToken, connectorId } = await api<{ accessToken: string; connectorId: number | null }>('connect-token', {});
       if (!accessToken) throw new Error('O servidor não retornou o token de conexão.');
+      setConnectorId(connectorId);
       setToken(accessToken);
     } catch (e: any) {
       Alert.alert('Erro ao conectar', e?.message ?? String(e));
@@ -257,6 +259,7 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
           <PluggyConnect
             connectToken={token}
             includeSandbox={false}
+            {...(connectorId ? { connectorIds: [connectorId], selectedConnectorId: connectorId } : {})}
             language="pt"
             forceOauthInBrowser={false}
             onClose={() => setToken(null)}
