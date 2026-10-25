@@ -2,20 +2,25 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const key = () => process.env.GEMINI_API_KEY!;
 
-let fallbacks: string[] | null = null;
+let available: string[] | null = null;
+const dead = new Set<string>();                 // modelos indisponíveis para a chave (404/400)
+const exhausted = new Map<string, number>();    // cota gratuita esgotada até (timestamp)
 
-// Modelos "flash" disponíveis para a chave (usados se o principal estiver sobrecarregado)
-export async function flashModels(): Promise<string[]> {
-  if (fallbacks) return fallbacks;
-  const r = await fetch(`${BASE}/models?pageSize=200`, { headers: { 'x-goog-api-key': key() } });
-  if (!r.ok) return (fallbacks = []);
+// Modelos "flash" da chave. Cada modelo tem cota gratuita própria, então alternar entre eles
+// multiplica o limite diário.
+async function flashModels(): Promise<string[]> {
+  if (available) return available;
+  const r = await fetch(`${BASE}/models?pageSize=200`, { headers: { 'x-goog-api-key': key() } }).catch(() => null);
+  if (!r?.ok) return (available = []);
   const d = await r.json();
-  fallbacks = (d.models ?? [])
+  available = (d.models ?? [])
     .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent'))
     .map((m: any) => String(m.name).replace('models/', ''))
-    .filter((n: string) => n.includes('flash') && !/image|tts|audio|live|preview|exp/.test(n));
-  return fallbacks!;
+    .filter((n: string) => n.includes('flash') && !/image|tts|audio|live|preview|exp|omni/.test(n))
+    .sort((a: string, b: string) => b.localeCompare(a, undefined, { numeric: true })); // mais novos primeiro
+  return available!;
 }
+export { flashModels };
 
 async function call(model: string, prompt: string): Promise<Response> {
   return fetch(`${BASE}/models/${model}:generateContent`, {
@@ -26,25 +31,38 @@ async function call(model: string, prompt: string): Promise<Response> {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: { responseMimeType: 'application/json', temperature: 0 },
     }),
-  });
+  }).catch(() => new Response('timeout', { status: 504 }));
 }
+
+export class QuotaError extends Error {}
 
 export async function geminiJSON<T>(prompt: string): Promise<T> {
   const primary = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
-  const models = [primary, ...(await flashModels()).filter(m => m !== primary)].slice(0, 3);
+  const now = Date.now();
+  const models = [primary, ...(await flashModels()).filter(m => m !== primary)]
+    .filter(m => !dead.has(m) && (exhausted.get(m) ?? 0) < now)
+    .slice(0, 5);
   let last = '';
+  let quota = 0;
+  const started = Date.now();
   for (const model of models) {
-    for (let attempt = 0; attempt < 1; attempt++) {
-      const r = await call(model, prompt).catch(() => new Response('timeout', { status: 504 }));
-      if (r.ok) {
-        const d = await r.json();
-        const text = d.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? '').join('') || '[]';
-        return JSON.parse(text) as T;
-      }
-      last = `Gemini ${model} ${r.status}: ${(await r.text()).slice(0, 200)}`;
-      if (r.status !== 429 && r.status < 500) break; // erro definitivo neste modelo
-      await sleep(1500 * (attempt + 1));
+    if (Date.now() - started > 45000) break; // não estoura o limite de 60s da função
+    const r = await call(model, prompt);
+    if (r.ok) {
+      const d = await r.json();
+      const text = d.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? '').join('') || '[]';
+      return JSON.parse(text) as T;
     }
+    const body = (await r.text()).slice(0, 300);
+    last = `Gemini ${model} ${r.status}: ${body}`;
+    if (r.status === 404 || r.status === 400) dead.add(model);
+    else if (r.status === 429) {
+      quota++;
+      // cota diária esgotada: pula este modelo por 1h; limite por minuto: 1 min
+      exhausted.set(model, Date.now() + (/per.?day|daily|exceeded your current quota/i.test(body) ? 3600_000 : 60_000));
+    } else if (r.status >= 500) await sleep(800);
   }
-  throw new Error(last);
+  if (quota && quota === models.length)
+    throw new QuotaError('Limite gratuito do Gemini atingido por hoje. Tente novamente mais tarde (renova diariamente).');
+  throw new Error(last || 'Nenhum modelo Gemini disponível no momento.');
 }

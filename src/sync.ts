@@ -63,7 +63,7 @@ function fromHint(hint: string | null, type: string) {
 }
 
 // Refina categorias com o Gemini, 40 por vez (evita estourar o tempo do servidor)
-export async function classifyPending(maxBatches = 8) {
+export async function classifyPending(maxBatches = 3) {
   const d = await db();
   for (let b = 0; b < maxBatches; b++) {
     const rows = await d.getAllAsync<{ id: string; description: string; type: string; category: string }>(

@@ -23,6 +23,6 @@ Dados: ${JSON.stringify(data)}`;
       })) : [],
     });
   } catch (e: any) {
-    return json({ error: e.message }, 502);
+    return json({ error: e.message, quota: e?.name === 'QuotaError' || /Limite gratuito/.test(e.message) }, e?.message?.includes('Limite gratuito') ? 429 : 502);
   }
 }
