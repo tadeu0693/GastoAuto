@@ -37,6 +37,7 @@ export async function db() {
     CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY, name TEXT);
     CREATE TABLE IF NOT EXISTS rules (merchant_key TEXT PRIMARY KEY, category TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
+    CREATE TABLE IF NOT EXISTS pending_class (id TEXT PRIMARY KEY);
   `);
   return _db;
 }
@@ -71,6 +72,7 @@ export async function insertTx(t: Tx) {
 export async function setCategory(tx: Tx, category: string) {
   const d = await db();
   await d.runAsync('UPDATE tx SET category=? WHERE id=?', category, tx.id);
+  await d.runAsync('DELETE FROM pending_class WHERE id=?', tx.id); // escolha do usuário prevalece
   const k = merchantKey(tx.merchant || tx.description);
   if (k) {
     await d.runAsync('INSERT OR REPLACE INTO rules(merchant_key,category) VALUES(?,?)', k, category);

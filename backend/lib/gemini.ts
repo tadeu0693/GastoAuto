@@ -17,8 +17,9 @@ export async function flashModels(): Promise<string[]> {
   return fallbacks!;
 }
 
-async function call(model: string, prompt: string) {
+async function call(model: string, prompt: string): Promise<Response> {
   return fetch(`${BASE}/models/${model}:generateContent`, {
+    signal: AbortSignal.timeout(25000),
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-goog-api-key': key() },
     body: JSON.stringify({
@@ -30,11 +31,11 @@ async function call(model: string, prompt: string) {
 
 export async function geminiJSON<T>(prompt: string): Promise<T> {
   const primary = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
-  const models = [primary, ...(await flashModels()).filter(m => m !== primary)].slice(0, 4);
+  const models = [primary, ...(await flashModels()).filter(m => m !== primary)].slice(0, 3);
   let last = '';
   for (const model of models) {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const r = await call(model, prompt);
+    for (let attempt = 0; attempt < 1; attempt++) {
+      const r = await call(model, prompt).catch(() => new Response('timeout', { status: 504 }));
       if (r.ok) {
         const d = await r.json();
         const text = d.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? '').join('') || '[]';
