@@ -89,9 +89,9 @@ function App() {
       </View>
 
       <View style={s.tabs}>
-        {([['resumo', 'Resumo'], ['lanc', 'Lançamentos'], ['economia', 'Economia'], ['ajustes', 'Ajustes']] as const).map(([k, t]) => (
+        {([['resumo', 'Resumo'], ['lanc', 'Extrato'], ['economia', 'Economia'], ['ajustes', 'Ajustes']] as const).map(([k, t]) => (
           <Pressable key={k} style={s.tab} onPress={() => setTab(k)}>
-            <Text style={[s.tabText, tab === k && { color: C.accent }]}>{t}</Text>
+            <Text style={[s.tabText, tab === k && { color: C.accent }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{t}</Text>
           </Pressable>
         ))}
       </View>
@@ -345,7 +345,7 @@ const s = StyleSheet.create({
   bar: { height: 6, backgroundColor: C.accent, borderRadius: 3 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: C.line },
   tabs: { flexDirection: 'row', borderTopWidth: 1, borderColor: C.line, backgroundColor: C.card },
-  tab: { flex: 1, alignItems: 'center', paddingVertical: 14 },
+  tab: { flex: 1, alignItems: 'center', paddingVertical: 14, paddingHorizontal: 4 },
   tabText: { color: C.dim, fontWeight: '600' },
   overlay: { flex: 1, backgroundColor: '#0008', justifyContent: 'flex-end' },
   sheet: { backgroundColor: C.card, padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20 },

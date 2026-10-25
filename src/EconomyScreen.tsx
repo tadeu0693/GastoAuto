@@ -110,8 +110,8 @@ export default function EconomyScreen({ month, version, onRefresh, syncing }: { 
           return (
             <Pressable key={c} style={{ marginBottom: 12 }} onPress={() => { setValue(String(lim)); setEdit({ kind: 'budget', cat: c }); }}>
               <View style={s.rowBetween}>
-                <Text style={s.txt}>{c}</Text>
-                <Text style={[s.txt, { color }]}>{brl(sp)} / {brl(lim)}</Text>
+                <Text style={[s.txt, { marginRight: 8 }]}>{c}</Text>
+                <Text style={[s.txt, { color, flexShrink: 1, textAlign: 'right' }]} numberOfLines={1} adjustsFontSizeToFit>{brl(sp)} / {brl(lim)}</Text>
               </View>
               <View style={s.barBg}><View style={[s.bar, { width: `${Math.min(100, pct * 100)}%`, backgroundColor: color }]} /></View>
               <Text style={s.dim}>{pct >= 1 ? `Estourou ${brl(sp - lim)}` : `Resta ${brl(lim - sp)}`}</Text>
@@ -121,18 +121,16 @@ export default function EconomyScreen({ month, version, onRefresh, syncing }: { 
         {withoutBudget.map(c => (
           <Pressable key={c} style={[s.rowBetween, { paddingVertical: 8, borderTopWidth: 1, borderColor: C.line }]}
             onPress={() => { setValue(avg[c] ? String(Math.round(avg[c])) : ''); setEdit({ kind: 'budget', cat: c }); }}>
-            <Text style={s.txt}>{c}</Text>
-            <Text style={s.dim}>{brl(spent[c] || 0)} · média {brl(avg[c] || 0)}  ＋</Text>
+            <Text style={[s.txt, { flexShrink: 0, marginRight: 8 }]}>{c}</Text>
+            <Text style={[s.dim, { flexShrink: 1, textAlign: 'right' }]} numberOfLines={1} adjustsFontSizeToFit>{brl(spent[c] || 0)} · média {brl(avg[c] || 0)}  ＋</Text>
           </Pressable>
         ))}
       </View>
 
       {/* Assinaturas e recorrentes */}
       <View style={s.card}>
-        <View style={s.rowBetween}>
-          <Text style={s.h}>Assinaturas e recorrentes</Text>
-          <Text style={[s.txt, { color: C.red }]}>{brl(recTotal)}/mês</Text>
-        </View>
+        <Text style={s.h}>Assinaturas e recorrentes</Text>
+        {rec.length > 0 && <Text style={[s.mid, { color: C.red, marginTop: 2 }]}>{brl(recTotal)}/mês</Text>}
         {rec.length === 0 && <Text style={[s.dim, { marginTop: 6 }]}>Nenhuma cobrança recorrente encontrada ainda (precisa de pelo menos 2 meses de dados).</Text>}
         {rec.map(r => (
           <View key={r.key} style={[s.rowBetween, { paddingVertical: 8, borderTopWidth: 1, borderColor: C.line, marginTop: 6 }]}>
