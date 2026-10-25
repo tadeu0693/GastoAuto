@@ -19,7 +19,7 @@ export async function flashModels(): Promise<string[]> {
 
 async function call(model: string, prompt: string): Promise<Response> {
   return fetch(`${BASE}/models/${model}:generateContent`, {
-    signal: AbortSignal.timeout(25000),
+    signal: AbortSignal.timeout(18000),
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-goog-api-key': key() },
     body: JSON.stringify({
