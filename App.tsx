@@ -6,7 +6,7 @@ import {
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { NotifCapture } from './modules/notif-capture/src/NotifCaptureModule';
-import { addItem, CATEGORIES, deleteTx, items as listItems, listMonth, NEUTRAL, removeItem, setCategory, Tx } from './src/db';
+import { addItem, getMeta, CATEGORIES, deleteTx, items as listItems, listMonth, NEUTRAL, removeItem, setCategory, Tx } from './src/db';
 import { syncAll } from './src/sync';
 import { api } from './src/api';
 import { registerBackground } from './src/background';
@@ -39,7 +39,17 @@ function App() {
 
   const sync = useCallback(async (silent = false) => {
     setSyncing(true);
-    try { await syncAll(); } catch (e: any) { if (!silent) Alert.alert('Erro ao sincronizar', e.message); }
+    try {
+      const r = await syncAll();
+      if (!silent) {
+        const pend = r.items.filter(i => i.execution && !/SUCCESS|PARTIAL_SUCCESS/.test(i.execution) || i.status === 'UPDATING');
+        if (r.errors.length) Alert.alert('Erro ao sincronizar', r.errors.join('\n'));
+        else if (r.items.length && r.items.every(i => i.transactions === 0))
+          Alert.alert('Open Finance', pend.length
+            ? 'Seus bancos ainda estão sincronizando no MeuPluggy. O primeiro carregamento pode levar alguns minutos — puxe para atualizar depois.'
+            : 'Conectado, mas nenhuma movimentação foi encontrada nos últimos 90 dias. Confira em meu.pluggy.ai se seus bancos estão conectados e autorizados.');
+      }
+    } catch (e: any) { if (!silent) Alert.alert('Erro ao sincronizar', e.message); }
     finally { setSyncing(false); load(); }
   }, [load]);
 
@@ -174,7 +184,7 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
   const [perm, setPerm] = useState(false);
   const [allowed, setAllowed] = useState<string[]>([]);
   const [known, setKnown] = useState<string[]>([]);
-  const [its, setIts] = useState<{ id: string; name: string }[]>([]);
+  const [its, setIts] = useState<{ id: string; name: string; info?: string }[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [connectorId, setConnectorId] = useState<number | null>(null);
 
@@ -183,7 +193,18 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
     const a = NotifCapture.getAllowedPackages();
     setAllowed(a);
     setKnown([...new Set([...NotifCapture.getDefaultPackages(), ...NotifCapture.getSeenPackages(), ...a])].sort((x, y) => appName(x).localeCompare(appName(y))));
-    setIts(await listItems());
+    const list = await listItems();
+    setIts(await Promise.all(list.map(async i => {
+      const raw = await getMeta(`status:${i.id}`);
+      let info = 'Aguardando primeira sincronização';
+      try {
+        const st = raw && JSON.parse(raw);
+        if (st) info = st.status === 'UPDATING' ? 'Sincronizando no banco…'
+          : st.error ? `Erro: ${st.error}`
+          : `${st.accounts} conta(s) · ${st.transactions} movimentação(ões) no último sync`;
+      } catch {}
+      return { ...i, info };
+    })));
   }, []);
   useEffect(() => {
     refresh();
@@ -230,7 +251,10 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
         <Text style={[s.dim, { marginVertical: 6 }]}>Conecte pelo MeuPluggy (grátis, uso pessoal). Concilia com as notificações e traz o que elas não mostram.</Text>
         {its.map(i => (
           <View key={i.id} style={[s.row, { marginBottom: 6 }]}>
-            <Text style={[s.txt, { flex: 1 }]}>{i.name}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={s.txt}>{i.name}</Text>
+              {!!i.info && <Text style={s.dim}>{i.info}</Text>}
+            </View>
             <Pressable onPress={async () => { await removeItem(i.id); refresh(); }}><Text style={{ color: C.red }}>Remover</Text></Pressable>
           </View>
         ))}

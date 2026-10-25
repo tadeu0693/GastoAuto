@@ -38,15 +38,29 @@ export async function processNotifications() {
 }
 
 // 2) Open Finance (MeuPluggy) -> concilia com o que veio por notificação
-export async function syncOpenFinance() {
+export type ItemStatus = { id: string; status: string | null; execution: string | null; accounts: number; transactions: number; error?: string | null; lastUpdatedAt?: string | null };
+
+export async function syncOpenFinance(): Promise<{ count: number; errors: string[]; items: ItemStatus[] }> {
   const its = await items();
-  if (!its.length) return 0;
-  const last = await getMeta('lastSync');
-  const from = last ? new Date(new Date(last).getTime() - 7 * 864e5) : new Date(Date.now() - 90 * 864e5);
-  const { transactions, errors } = await api<{ transactions: any[]; errors: string[] }>('transactions', {
-    itemIds: its.map(i => i.id), from: day(from),
-  });
-  if (errors?.length) console.warn(errors);
+  if (!its.length) return { count: 0, errors: [], items: [] };
+  // período por item: 90 dias até o item trazer dados pela primeira vez; depois, últimos 7 dias
+  const transactions: any[] = [];
+  const errors: string[] = [];
+  const statuses: ItemStatus[] = [];
+  for (const it of its) {
+    const last = await getMeta(`lastSync:${it.id}`);
+    const from = last ? new Date(new Date(last).getTime() - 7 * 864e5) : new Date(Date.now() - 90 * 864e5);
+    const r = await api<{ transactions: any[]; errors: string[]; items: ItemStatus[] }>('transactions', {
+      itemIds: [it.id], from: day(from),
+    });
+    transactions.push(...r.transactions);
+    errors.push(...(r.errors ?? []));
+    for (const st of r.items ?? []) {
+      statuses.push(st);
+      await setMeta(`status:${st.id}`, JSON.stringify(st));
+      if (st.transactions > 0) await setMeta(`lastSync:${st.id}`, iso(new Date()));
+    }
+  }
   const d = await db();
   const toClassify: any[] = [];
   for (const t of transactions) {
@@ -80,17 +94,16 @@ export async function syncOpenFinance() {
       await insertTx(tx);
     }
   }
-  await setMeta('lastSync', iso(new Date()));
-  return toClassify.length;
+  return { count: toClassify.length, errors, items: statuses };
 }
 
 export async function syncAll() {
-  if (running) return { notif: 0, of: 0 };
+  if (running) return { notif: 0, of: 0, errors: [] as string[], items: [] as ItemStatus[] };
   running = true;
   try {
     const notif = await processNotifications();
-    const of = await syncOpenFinance();
-    return { notif, of };
+    const r = await syncOpenFinance();
+    return { notif, of: r.count, errors: r.errors, items: r.items };
   } finally {
     running = false;
   }
