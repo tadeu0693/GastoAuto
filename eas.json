@@ -1,0 +1,26 @@
+{
+  "cli": {
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://gastoauto-api.vercel.app",
+        "EXPO_PUBLIC_APP_TOKEN": "fdce16bdd14a088614c66738252394c3b3adc40961802a55"
+      }
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://gastoauto-api.vercel.app",
+        "EXPO_PUBLIC_APP_TOKEN": "fdce16bdd14a088614c66738252394c3b3adc40961802a55"
+      }
+    }
+  }
+}
