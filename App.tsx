@@ -52,7 +52,8 @@ function App() {
   }, []);
 
   const shift = (n: number) => setMonth(m => new Date(m.getFullYear(), m.getMonth() + n, 1));
-  const label = month.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  const m = month.toLocaleDateString('pt-BR', { month: 'long' });
+  const label = `${m.charAt(0).toUpperCase()}${m.slice(1)} ${month.getFullYear()}`;
 
   return (
     <SafeAreaView style={s.root} edges={['top', 'bottom']}>
@@ -195,14 +196,24 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
     setAllowed(next);
   };
 
+  const [opening, setOpening] = useState(false);
   const connect = async () => {
+    if (opening) return;
+    setOpening(true);
     try {
       if (!PluggyConnect) PluggyConnect = require('react-native-pluggy-connect').PluggyConnect;
-      setToken((await api<{ accessToken: string }>('connect-token', {})).accessToken); }
-    catch (e: any) { Alert.alert('Erro', e.message); }
+      const { accessToken } = await api<{ accessToken: string }>('connect-token', {});
+      if (!accessToken) throw new Error('O servidor não retornou o token de conexão.');
+      setToken(accessToken);
+    } catch (e: any) {
+      Alert.alert('Erro ao conectar', e?.message ?? String(e));
+    } finally {
+      setOpening(false);
+    }
   };
 
   return (
+    <>
     <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
       <View style={s.card}>
         <Text style={s.mid}>Leitura de notificações</Text>
@@ -221,7 +232,9 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
             <Pressable onPress={async () => { await removeItem(i.id); refresh(); }}><Text style={{ color: C.red }}>Remover</Text></Pressable>
           </View>
         ))}
-        <Pressable style={s.btn} onPress={connect}><Text style={s.btnT}>+ Conectar conta</Text></Pressable>
+        <Pressable style={[s.btn, opening && { opacity: 0.6 }]} onPress={connect}>
+          {opening ? <ActivityIndicator color="#fff" /> : <Text style={s.btnT}>+ Conectar conta</Text>}
+        </Pressable>
       </View>
 
       <View style={s.card}>
@@ -235,23 +248,30 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
         <Text style={[s.dim, { marginTop: 6 }]}>Apps que notificarem valores em R$ aparecem aqui para você ativar.</Text>
       </View>
 
-      {token && PluggyConnect && (
-        <PluggyConnect
-          connectToken={token}
-          includeSandbox={false}
-          language="pt"
-          forceOauthInBrowser={false}
-          onClose={() => setToken(null)}
-          onError={(e: any) => { setToken(null); Alert.alert('Erro na conexão', e?.message ?? 'Falha'); }}
-          onSuccess={async ({ item }: any) => {
-            await addItem(item.id, item.connector?.name ?? 'Conta');
-            setToken(null);
-            refresh();
-            onConnected();
-          }}
-        />
-      )}
     </ScrollView>
+
+    {/* Widget da Pluggy em tela cheia */}
+    <Modal visible={!!token} animationType="slide" onRequestClose={() => setToken(null)}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }} edges={['top', 'bottom']}>
+        {token && PluggyConnect && (
+          <PluggyConnect
+            connectToken={token}
+            includeSandbox={false}
+            language="pt"
+            forceOauthInBrowser={false}
+            onClose={() => setToken(null)}
+            onError={(e: any) => { setToken(null); Alert.alert('Erro na conexão', e?.message ?? 'Falha'); }}
+            onSuccess={async ({ item }: any) => {
+              await addItem(item.id, item.connector?.name ?? 'Conta');
+              setToken(null);
+              refresh();
+              onConnected();
+            }}
+          />
+        )}
+      </SafeAreaView>
+    </Modal>
+    </>
   );
 }
 
@@ -259,7 +279,7 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24, paddingVertical: 12 },
   arrow: { color: C.text, fontSize: 28, paddingHorizontal: 8 },
-  month: { color: C.text, fontSize: 17, fontWeight: '600', textTransform: 'capitalize', minWidth: 150, textAlign: 'center' },
+  month: { color: C.text, fontSize: 17, fontWeight: '600', minWidth: 150, textAlign: 'center' },
   card: { backgroundColor: C.card, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: C.line },
   big: { fontSize: 32, fontWeight: '700', marginTop: 4 },
   mid: { color: C.text, fontSize: 17, fontWeight: '600' },
