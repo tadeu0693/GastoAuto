@@ -1,12 +1,22 @@
 const BASE = 'https://api.pluggy.ai';
 
+// fetch com limite de tempo: a Pluggy às vezes segura a conexão sem responder
+async function tfetch(url: string, init: RequestInit = {}, ms = 12000): Promise<Response> {
+  try {
+    return await fetch(url, { ...init, signal: AbortSignal.timeout(ms) });
+  } catch (e: any) {
+    if (e?.name === 'TimeoutError' || e?.name === 'AbortError') return new Response('timeout', { status: 504 });
+    throw e;
+  }
+}
+
 let cached: { key: string; exp: number } | null = null;
 
 export async function apiKey(): Promise<string> {
   if (cached && cached.exp > Date.now()) return cached.key;
   let r!: Response;
   for (let attempt = 0; attempt < 3; attempt++) {
-    r = await fetch(`${BASE}/auth`, {
+    r = await tfetch(`${BASE}/auth`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -28,8 +38,8 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 // Repete em instabilidade da Pluggy (429/5xx)
 export async function pluggy(path: string, init: RequestInit = {}) {
   let last = '';
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const r = await fetch(`${BASE}${path}`, {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const r = await tfetch(`${BASE}${path}`, {
       ...init,
       headers: { 'content-type': 'application/json', 'X-API-KEY': await apiKey(), ...(init.headers || {}) },
     });
