@@ -261,7 +261,7 @@ function Ajustes({ onConnected }: { onConnected: () => void }) {
             includeSandbox={false}
             {...(connectorId ? { connectorIds: [connectorId], selectedConnectorId: connectorId } : {})}
             language="pt"
-            forceOauthInBrowser={false}
+            forceOauthInBrowser
             onClose={() => setToken(null)}
             onError={(e: any) => { setToken(null); Alert.alert('Erro na conexão', e?.message ?? 'Falha'); }}
             onSuccess={async ({ item }: any) => {
