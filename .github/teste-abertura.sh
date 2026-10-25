@@ -28,6 +28,8 @@ PY
   echo "tap '$1' -> $xy" >> logs/taps.txt
   [ -n "$xy" ] && adb shell input tap $xy
 }
+tap "Economia"; sleep 4
+adb exec-out screencap -p > logs/tela_economia.png
 tap "Ajustes"; sleep 3
 adb exec-out screencap -p > logs/tela_ajustes.png
 tap "Conectar conta"; sleep 15

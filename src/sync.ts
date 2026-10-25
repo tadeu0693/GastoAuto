@@ -1,5 +1,6 @@
 import { NotifCapture } from '../modules/notif-capture/src/NotifCaptureModule';
 import { api } from './api';
+import { checkBudgetAlerts } from './economy';
 import { db, getMeta, insertTx, items, ruleFor, setMeta, Tx } from './db';
 
 let running = false;
@@ -141,6 +142,7 @@ export async function syncAll() {
   try {
     const notif = await processNotifications();
     const r = await syncOpenFinance();
+    await checkBudgetAlerts().catch(() => {});
     return { notif, of: r.count, errors: r.errors, items: r.items };
   } finally {
     running = false;

@@ -10,6 +10,7 @@ import { addItem, getMeta, getBalances, Balance, CATEGORIES, deleteTx, items as 
 import { syncAll } from './src/sync';
 import { api } from './src/api';
 import { registerBackground } from './src/background';
+import EconomyScreen from './src/EconomyScreen';
 
 const C = { bg: '#0E1116', card: '#171B22', line: '#232935', text: '#E8ECF2', dim: '#8A93A3', red: '#FF6B6B', green: '#3DDC97', accent: '#6C8CFF' };
 const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -30,7 +31,8 @@ export default function Root() {
 }
 
 function App() {
-  const [tab, setTab] = useState<'resumo' | 'lanc' | 'ajustes'>('resumo');
+  const [tab, setTab] = useState<'resumo' | 'lanc' | 'economia' | 'ajustes'>('resumo');
+  const [version, setVersion] = useState(0);
   const [month, setMonth] = useState(new Date());
   const [txs, setTxs] = useState<Tx[]>([]);
   const [syncing, setSyncing] = useState(false);
@@ -54,7 +56,7 @@ function App() {
             : 'Conectado, mas nenhuma movimentação foi encontrada nos últimos 90 dias. Confira em meu.pluggy.ai se seus bancos estão conectados e autorizados.');
       }
     } catch (e: any) { if (!silent) Alert.alert('Erro ao sincronizar', e.message); }
-    finally { setSyncing(false); load(); }
+    finally { setSyncing(false); load(); setVersion(v => v + 1); }
   }, [load]);
 
   useEffect(() => { load(); }, [load]);
@@ -82,11 +84,12 @@ function App() {
       <View style={{ flex: 1 }}>
         {tab === 'resumo' && <Resumo txs={txs} balances={balances} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'lanc' && <Lancamentos txs={txs} onChange={load} onRefresh={() => sync()} syncing={syncing} />}
+        {tab === 'economia' && <EconomyScreen month={month} version={version} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'ajustes' && <Ajustes onConnected={() => sync()} />}
       </View>
 
       <View style={s.tabs}>
-        {([['resumo', 'Resumo'], ['lanc', 'Lançamentos'], ['ajustes', 'Ajustes']] as const).map(([k, t]) => (
+        {([['resumo', 'Resumo'], ['lanc', 'Lançamentos'], ['economia', 'Economia'], ['ajustes', 'Ajustes']] as const).map(([k, t]) => (
           <Pressable key={k} style={s.tab} onPress={() => setTab(k)}>
             <Text style={[s.tabText, tab === k && { color: C.accent }]}>{t}</Text>
           </Pressable>

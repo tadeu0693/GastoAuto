@@ -29,6 +29,12 @@
             "extraProguardRules": "-keep class androidx.work.** { *; }\n-keep class * extends androidx.room.RoomDatabase { *; }"
           }
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#6C8CFF"
+        }
       ]
     ],
     "platforms": [
