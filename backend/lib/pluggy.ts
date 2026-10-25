@@ -4,15 +4,20 @@ let cached: { key: string; exp: number } | null = null;
 
 export async function apiKey(): Promise<string> {
   if (cached && cached.exp > Date.now()) return cached.key;
-  const r = await fetch(`${BASE}/auth`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      clientId: process.env.PLUGGY_CLIENT_ID,
-      clientSecret: process.env.PLUGGY_CLIENT_SECRET,
-    }),
-  });
-  if (!r.ok) throw new Error(`Pluggy auth ${r.status}`);
+  let r!: Response;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    r = await fetch(`${BASE}/auth`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        clientId: process.env.PLUGGY_CLIENT_ID,
+        clientSecret: process.env.PLUGGY_CLIENT_SECRET,
+      }),
+    });
+    if (r.ok || (r.status < 500 && r.status !== 429)) break;
+    await new Promise(res => setTimeout(res, 1000 * 2 ** attempt));
+  }
+  if (!r.ok) throw new Error(`Pluggy /auth ${r.status}: falha ao autenticar`);
   const { apiKey } = await r.json();
   cached = { key: apiKey, exp: Date.now() + 100 * 60_000 }; // válida 2h
   return apiKey;
