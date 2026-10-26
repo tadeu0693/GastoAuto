@@ -39,7 +39,43 @@ export async function db() {
     CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
     CREATE TABLE IF NOT EXISTS pending_class (id TEXT PRIMARY KEY);
   `);
+  await migrateLocalDates(_db);
   return _db;
+}
+
+const pad = (n: number) => String(Math.floor(n)).padStart(2, '0');
+
+// ISO no horário local do aparelho, com offset (ex.: 2026-10-31T22:15:00.000-03:00).
+// Assim substr(date,1,7) agrupa pelo mês local, não pelo UTC.
+export function localIso(d: Date) {
+  const off = -d.getTimezoneOffset();
+  const a = Math.abs(off);
+  const local = new Date(d.getTime() + off * 60000).toISOString().slice(0, 23);
+  return `${local}${off >= 0 ? '+' : '-'}${pad(a / 60)}:${pad(a % 60)}`;
+}
+
+// Datas da Pluggy: meia-noite UTC = só data (mantém o dia); senão converte para local.
+export function pluggyDate(s: string) {
+  const d = new Date(s);
+  if (isNaN(d.getTime())) return s;
+  if (d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0)
+    return localIso(new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12));
+  return localIso(d);
+}
+
+// Converte datas antigas gravadas em UTC ("...Z") para horário local (roda uma vez)
+async function migrateLocalDates(d: SQLite.SQLiteDatabase) {
+  const done = await d.getFirstAsync('SELECT 1 FROM meta WHERE key=?', 'migr:localDates');
+  if (done) return;
+  const rows = await d.getAllAsync<{ id: string; source: string; date: string }>(
+    `SELECT id, source, date FROM tx WHERE date LIKE '%Z'`);
+  await d.withTransactionAsync(async () => {
+    for (const r of rows) {
+      const nd = r.source === 'pluggy' ? pluggyDate(r.date) : localIso(new Date(r.date));
+      await d.runAsync('UPDATE tx SET date=? WHERE id=?', nd, r.id);
+    }
+    await d.runAsync('INSERT OR REPLACE INTO meta(key,value) VALUES(?,?)', 'migr:localDates', '1');
+  });
 }
 
 export const merchantKey = (s: string | null | undefined) =>

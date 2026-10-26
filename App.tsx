@@ -15,7 +15,7 @@ import CategoryDetail from './src/CategoryDetail';
 
 const C = { bg: '#0E1116', card: '#171B22', line: '#232935', text: '#E8ECF2', dim: '#8A93A3', red: '#FF6B6B', green: '#3DDC97', accent: '#6C8CFF' };
 const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-const ymOf = (d: Date) => d.toISOString().slice(0, 7);
+const ymOf = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 const APP_NAMES: Record<string, string> = {
   'com.nu.production': 'Nubank', 'com.itau': 'Itaú', 'com.itau.iti': 'iti', 'com.bradesco': 'Bradesco',
   'br.com.bradesco.next': 'Next', 'br.com.bb.android': 'Banco do Brasil', 'br.com.gabba.Caixa': 'Caixa',

@@ -1,12 +1,12 @@
 import { NotifCapture } from '../modules/notif-capture/src/NotifCaptureModule';
 import { api } from './api';
 import { checkBudgetAlerts } from './economy';
-import { db, getMeta, insertTx, items, ruleFor, setMeta, Tx } from './db';
+import { db, getMeta, insertTx, items, localIso, pluggyDate, ruleFor, setMeta, Tx } from './db';
 
 let running = false;
 
 const iso = (d: Date) => d.toISOString();
-const day = (d: Date) => d.toISOString().slice(0, 10);
+const day = (d: Date) => localIso(d).slice(0, 10);
 
 // 1) Notificações dos bancos -> Gemini extrai valor/estabelecimento/categoria
 export async function processNotifications() {
@@ -15,26 +15,32 @@ export async function processNotifications() {
   const { results } = await api<{ results: any[] }>('classify', { mode: 'notification', items: pending });
   const byId = new Map(pending.map(p => [p.id, p]));
   const d = await db();
+  const done: string[] = [];
   let n = 0;
-  for (const r of results) {
-    const p = byId.get(r.id);
-    if (!p || !r.isTransaction || !(r.amount > 0)) continue;
-    const date = new Date(p.ts);
-    // mesma compra notificada por 2 apps (ex.: banco + Google Wallet)
+  for (const r of results ?? []) {
+    const p = byId.get(r?.id);
+    if (!p) continue;
+    done.push(p.id);
+    if (!r.isTransaction || !(r.amount > 0)) continue;
+    const date = localIso(new Date(p.ts));
+    // mesma compra notificada por 2 apps diferentes (ex.: banco + Google Wallet).
+    // Mesmo app com mesmo valor = compras distintas (o app nativo já descarta reenvios).
     const dup = await d.getFirstAsync(
-      `SELECT id FROM tx WHERE type=? AND abs(amount-?)<0.01 AND abs(julianday(date)-julianday(?))*1440<10`,
-      r.type, r.amount, iso(date),
+      `SELECT id FROM tx WHERE source='notif' AND type=? AND account<>? AND abs(amount-?)<0.01
+       AND abs(julianday(date)-julianday(?))*1440<10`,
+      r.type, p.app, r.amount, date,
     );
     if (dup) continue;
     await insertTx({
-      id: `n:${p.id}`, source: 'notif', external_id: null, date: iso(date),
+      id: `n:${p.id}`, source: 'notif', external_id: null, date,
       amount: r.amount, type: r.type, description: `${p.title} — ${p.text}`.slice(0, 300),
       merchant: r.merchant ?? null, category: (await ruleFor(r.merchant)) ?? r.category,
       account: p.app,
     });
     n++;
   }
-  NotifCapture.removePending(pending.map(p => p.id));
+  // só remove da fila o que o Gemini devolveu; o resto tenta de novo no próximo sync
+  if (done.length) NotifCapture.removePending(done);
   return n;
 }
 
@@ -113,7 +119,7 @@ export async function syncOpenFinance(): Promise<{ count: number; errors: string
     const match = await d.getFirstAsync<{ id: string }>(
       `SELECT id FROM tx WHERE source='notif' AND external_id IS NULL AND type=?
        AND abs(amount-?)<0.01 AND abs(julianday(substr(date,1,10))-julianday(?))<=3 LIMIT 1`,
-      t.type, t.amount, t.date.slice(0, 10),
+      t.type, t.amount, pluggyDate(t.date).slice(0, 10),
     );
     if (match) {
       await d.runAsync('UPDATE tx SET external_id=?, account=? WHERE id=?', t.externalId, t.account, match.id);
@@ -125,7 +131,7 @@ export async function syncOpenFinance(): Promise<{ count: number; errors: string
   for (const t of toClassify) {
     const id = `p:${t.externalId}`;
     await insertTx({
-      id, source: 'pluggy', external_id: t.externalId, date: t.date,
+      id, source: 'pluggy', external_id: t.externalId, date: pluggyDate(t.date),
       amount: t.amount, type: t.type, description: t.description, merchant: t.merchant ?? null,
       category: (await ruleFor(t.merchant ?? t.description)) ?? fromHint(t.hint, t.type), account: t.account,
     });
