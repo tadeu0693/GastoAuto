@@ -11,6 +11,7 @@ import { syncAll } from './src/sync';
 import { api } from './src/api';
 import { registerBackground } from './src/background';
 import EconomyScreen from './src/EconomyScreen';
+import CategoryDetail from './src/CategoryDetail';
 
 const C = { bg: '#0E1116', card: '#171B22', line: '#232935', text: '#E8ECF2', dim: '#8A93A3', red: '#FF6B6B', green: '#3DDC97', accent: '#6C8CFF' };
 const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -82,7 +83,7 @@ function App() {
       </View>
 
       <View style={{ flex: 1 }}>
-        {tab === 'resumo' && <Resumo txs={txs} balances={balances} onRefresh={() => sync()} syncing={syncing} />}
+        {tab === 'resumo' && <Resumo txs={txs} balances={balances} month={month} onChange={load} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'lanc' && <Lancamentos txs={txs} onChange={load} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'economia' && <EconomyScreen month={month} version={version} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'ajustes' && <Ajustes onConnected={() => sync()} />}
@@ -99,7 +100,8 @@ function App() {
   );
 }
 
-function Resumo({ txs, balances, onRefresh, syncing }: { txs: Tx[]; balances: { list: Balance[]; at: string | null }; onRefresh: () => void; syncing: boolean }) {
+function Resumo({ txs, balances, month, onChange, onRefresh, syncing }: { txs: Tx[]; balances: { list: Balance[]; at: string | null }; month: Date; onChange: () => void; onRefresh: () => void; syncing: boolean }) {
+  const [openCat, setOpenCat] = useState<string | null>(null);
   const { gastos, receitas, porCat } = useMemo(() => {
     let gastos = 0, receitas = 0;
     const porCat: Record<string, number> = {};
@@ -150,14 +152,16 @@ function Resumo({ txs, balances, onRefresh, syncing }: { txs: Tx[]; balances: { 
         <Text style={[s.dim, { marginBottom: 8 }]}>Por categoria</Text>
         {porCat.length === 0 && <Text style={s.dim}>Sem gastos registrados.</Text>}
         {porCat.map(([cat, v]) => (
-          <View key={cat} style={{ marginBottom: 10 }}>
+          <Pressable key={cat} style={{ marginBottom: 10 }} onPress={() => setOpenCat(cat)}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={s.txt}>{cat}</Text><Text style={s.txt}>{brl(v)} · {Math.round((v / gastos) * 100)}%</Text>
+              <Text style={s.txt}>{cat}</Text><Text style={s.txt}>{brl(v)} · {Math.round((v / gastos) * 100)}%  ›</Text>
             </View>
             <View style={s.barBg}><View style={[s.bar, { width: `${(v / max) * 100}%` }]} /></View>
-          </View>
+          </Pressable>
         ))}
+        {porCat.length > 0 && <Text style={[s.dim, { marginTop: 2 }]}>Toque numa categoria para ver os detalhes</Text>}
       </View>
+      <CategoryDetail category={openCat} txs={txs} month={month} onClose={() => setOpenCat(null)} onChange={onChange} />
     </ScrollView>
   );
 }
