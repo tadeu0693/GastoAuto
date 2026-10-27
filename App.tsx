@@ -83,7 +83,7 @@ function App() {
       </View>
 
       <View style={{ flex: 1 }}>
-        {tab === 'resumo' && <Resumo txs={txs} balances={balances} month={month} onChange={load} onRefresh={() => sync()} syncing={syncing} />}
+        {tab === 'resumo' && <Resumo onPlan={() => setTab('economia')} txs={txs} balances={balances} month={month} onChange={load} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'lanc' && <Lancamentos txs={txs} onChange={load} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'economia' && <EconomyScreen month={month} version={version} onRefresh={() => sync()} syncing={syncing} />}
         {tab === 'ajustes' && <Ajustes onConnected={() => sync()} />}
@@ -100,7 +100,7 @@ function App() {
   );
 }
 
-function Resumo({ txs, balances, month, onChange, onRefresh, syncing }: { txs: Tx[]; balances: { list: Balance[]; at: string | null }; month: Date; onChange: () => void; onRefresh: () => void; syncing: boolean }) {
+function Resumo({ onPlan, txs, balances, month, onChange, onRefresh, syncing }: { onPlan: () => void; txs: Tx[]; balances: { list: Balance[]; at: string | null }; month: Date; onChange: () => void; onRefresh: () => void; syncing: boolean }) {
   const [openCat, setOpenCat] = useState<string | null>(null);
   const { gastos, receitas, porCat } = useMemo(() => {
     let gastos = 0, receitas = 0;
@@ -123,7 +123,14 @@ function Resumo({ txs, balances, month, onChange, onRefresh, syncing }: { txs: T
           {(() => {
             const bank = balances.list.filter(b => b.type !== 'CREDIT');
             const total = bank.reduce((a, b) => a + (b.balance ?? 0), 0);
-            return <Text style={[s.big, { color: total >= 0 ? C.green : C.red }]}>{brl(total)}</Text>;
+            return <>
+              <Text style={[s.big, { color: total >= 0 ? C.green : C.red }]}>{brl(total)}</Text>
+              {total < -0.5 && (
+                <Pressable onPress={onPlan} style={{ backgroundColor: '#FF6B6B22', borderRadius: 10, padding: 10, marginTop: 8 }}>
+                  <Text style={[s.txt, { color: C.red }]}>Você está no negativo. Ver plano para sair ›</Text>
+                </Pressable>
+              )}
+            </>;
           })()}
           {balances.list.map(b => (
             <View key={b.id} style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>

@@ -11,7 +11,12 @@ Responda SOMENTE em JSON:
 {"resumo": string (2-3 frases sobre o mês vs. a média dos anteriores),
  "alertas": string[] (até 3: categorias bem acima do normal, assinaturas que subiram, orçamento/meta em risco),
  "sugestoes": [{"titulo": string, "economia": number (R$ por mês, realista), "detalhe": string (ação concreta, citando estabelecimentos quando fizer sentido)}] (3 a 5, ordenadas pela maior economia)}
-Não sugira cortar Moradia, Saúde ou Educação essenciais sem motivo claro. Use números reais dos dados.
+${data.negativo ? `ATENÇÃO: a pessoa está NO NEGATIVO (saldo das contas ${data.negativo.saldoContas}, cheque especial ~${data.negativo.taxaMes}% a.m.). O objetivo agora é SAIR DO NEGATIVO, não guardar:
+- O resumo deve dizer quanto o negativo custa de juros e se o ritmo atual tira ou não do negativo.
+- Sugestões focadas em liberar caixa já: cortes concretos por estabelecimento, cancelar recorrentes, adiar compras.
+- Inclua uma sugestão de trocar o cheque especial por crédito mais barato (empréstimo pessoal/consignado ou parcelamento do limite oferecido pelo banco) quando a dívida não couber em 1 mês.
+- Não sugira investir nem aumentar meta de economia enquanto estiver negativo.
+` : ''}Não sugira cortar Moradia, Saúde ou Educação essenciais sem motivo claro. Use números reais dos dados.
 Dados: ${JSON.stringify(data)}`;
   try {
     const r = await geminiJSON<any>(prompt);

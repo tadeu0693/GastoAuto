@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import { db, getMeta, merchantKey, NEUTRAL, setMeta, Tx } from './db';
+import { db, getBalances, getMeta, merchantKey, NEUTRAL, setMeta, Tx } from './db';
 
 export const ym = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 const addMonths = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth() + n, 1);
@@ -68,6 +68,106 @@ export async function goalStatus(ref = new Date()) {
   const daysLeft = isCurrent ? lastDay - today.getDate() + 1 : 0;
   const canSpend = income - goal - spent;
   return { goal, spent, income, incomeEstimated: incomeNow < avg.income, canSpend, daysLeft, perDay: daysLeft > 0 ? canSpend / daysLeft : 0 };
+}
+
+// ---------- Sair do negativo ----------
+// Categorias onde dá para cortar sem mexer no essencial (Moradia, Contas, Saúde, Educação)
+const CUTTABLE = ['Lazer', 'Compras', 'Alimentação', 'Assinaturas', 'Viagem', 'Outros', 'Transporte', 'Combustível', 'Mercado'];
+// fração máxima sugerida de corte por categoria
+const MAX_CUT: Record<string, number> = { Lazer: 0.6, Compras: 0.6, Viagem: 0.8, Assinaturas: 0.5, Alimentação: 0.4, Outros: 0.4, Transporte: 0.25, Combustível: 0.2, Mercado: 0.15 };
+
+export type DebtPlan = {
+  divida: number;            // quanto está negativo nas contas
+  taxa: number;              // % ao mês (cheque especial)
+  jurosMes: number;          // custo estimado de ficar no negativo por 1 mês
+  meses: number;             // prazo escolhido para sair
+  parcela: number;           // quanto precisa sobrar por mês para quitar no prazo
+  aEntrar: number;           // renda que ainda deve entrar este mês
+  faturasMes: number;        // faturas de cartão que vencem até o fim do mês
+  podeGastar: number;        // quanto ainda pode gastar no mês mantendo o plano (pode ser negativo)
+  porDia: number;
+  diasRestantes: number;
+  sobraMedia: number;        // renda média − gastos médios (ritmo atual)
+  mesesNoRitmoAtual: number | null; // null = no ritmo atual não sai (sobra ≤ juros)
+  corteNecessario: number;   // quanto cortar por mês para caber a parcela
+  cortes: { categoria: string; media: number; corte: number }[];
+  recorrentes: number;       // total de assinaturas/recorrentes por mês
+};
+
+export async function getDebtMonths() { return Number(await getMeta('debtMonths')) || 3; }
+export async function setDebtMonths(n: number) { await setMeta('debtMonths', String(n)); }
+export async function getDebtRate() { return Number(await getMeta('debtRate')) || 8; }
+export async function setDebtRate(v: number) { await setMeta('debtRate', String(Math.min(20, Math.max(0, v || 0)))); }
+
+// Saldo somado das contas (sem cartões). null = nenhuma conta conectada.
+export async function bankBalance(): Promise<number | null> {
+  const { list } = await getBalances();
+  const bank = list.filter(b => b.type !== 'CREDIT' && b.balance != null);
+  return bank.length ? bank.reduce((a, b) => a + (b.balance ?? 0), 0) : null;
+}
+
+// Plano para sair do negativo. Só existe quando o saldo das contas está abaixo de zero.
+export async function debtPlan(ref = new Date()): Promise<DebtPlan | null> {
+  const saldo = await bankBalance();
+  if (saldo == null || saldo >= -0.5) return null;
+  const divida = -saldo;
+  const taxa = await getDebtRate();
+  const meses = await getDebtMonths();
+  const i = taxa / 100;
+  const parcela = i > 0 ? (divida * i) / (1 - Math.pow(1 + i, -meses)) : divida / meses;
+
+  const today = new Date();
+  const month = ym(today);
+  const avg = await averages(today);
+  const incomeNow = await incomeOf(month);
+  const spentNow = Object.values(await spentByCategory(month)).reduce((a, b) => a + b, 0);
+  const aEntrar = Math.max(0, avg.income - incomeNow);
+
+  // faturas que vencem de hoje até o fim do mês
+  const { list } = await getBalances();
+  const fim = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59);
+  const faturasMes = list
+    .filter(b => b.type === 'CREDIT' && b.dueDate && (b.balance ?? 0) > 0)
+    .filter(b => { const d = new Date(b.dueDate!); return d >= new Date(today.toDateString()) && d <= fim; })
+    .reduce((a, b) => a + (b.balance ?? 0), 0);
+
+  // Saldo no fim do mês = −dívida − juros + aEntrar − faturas − gastos.
+  // Para amortizar a parcela: gastos ≤ aEntrar − faturas − parcela.
+  // (gastos no cartão aparecem na fatura do mês seguinte; aqui contamos o que ainda vai sair)
+  const podeGastar = aEntrar - faturasMes - parcela;
+  const diasRestantes = fim.getDate() - today.getDate() + 1;
+
+  const avgSpent = Object.values(avg.cats).reduce((a, b) => a + b, 0);
+  const sobraMedia = avg.income - avgSpent;
+  const jurosMes = divida * i;
+  let mesesNoRitmoAtual: number | null = null;
+  if (sobraMedia > jurosMes) {
+    mesesNoRitmoAtual = i > 0
+      ? Math.ceil(-Math.log(1 - (divida * i) / sobraMedia) / Math.log(1 + i))
+      : Math.ceil(divida / sobraMedia);
+  }
+
+  // cortes sugeridos: começa pelas categorias com maior folga até cobrir o necessário
+  const corteNecessario = Math.max(0, parcela - Math.max(0, sobraMedia));
+  const cortes: DebtPlan['cortes'] = [];
+  let falta = corteNecessario;
+  const candidatos = CUTTABLE
+    .map(c => ({ categoria: c, media: avg.cats[c] || 0, max: (avg.cats[c] || 0) * (MAX_CUT[c] ?? 0.3) }))
+    .filter(c => c.max >= 10)
+    .sort((a, b) => b.max - a.max);
+  for (const c of candidatos) {
+    if (falta <= 0) break;
+    const corte = Math.min(c.max, falta);
+    cortes.push({ categoria: c.categoria, media: c.media, corte: Math.ceil(corte / 10) * 10 });
+    falta -= corte;
+  }
+  const recorrentes = (await findRecurring(today)).reduce((a, r) => a + r.last, 0);
+
+  return {
+    divida, taxa, jurosMes, meses, parcela, aEntrar, faturasMes, podeGastar,
+    porDia: podeGastar > 0 && diasRestantes > 0 ? podeGastar / diasRestantes : 0,
+    diasRestantes, sobraMedia, mesesNoRitmoAtual, corteNecessario, cortes, recorrentes,
+  };
 }
 
 // ---------- Assinaturas e recorrentes ----------
@@ -160,6 +260,19 @@ export async function checkBudgetAlerts() {
       }
     }
   }
+  // entrou / saiu do negativo
+  const saldo = await bankBalance();
+  if (saldo != null) {
+    const neg = await getMeta('negSince');
+    if (saldo < -0.5 && !neg) {
+      await setMeta('negSince', new Date().toISOString());
+      await notify('🔴 Conta no negativo', `Seu saldo está em ${brl(saldo)}. Abra a aba Economia para ver o plano de saída.`);
+    } else if (saldo >= 0 && neg) {
+      await setMeta('negSince', '');
+      await notify('🎉 Você saiu do negativo!', `Saldo atual: ${brl(saldo)}. Agora dá para voltar a guardar.`);
+    }
+    if (saldo < -0.5) return; // no negativo, a meta de economia fica pausada
+  }
   // meta de economia em risco
   const g = await goalStatus();
   if (g.goal > 0 && g.canSpend < 0 && !(await getMeta(`alert:${month}:goal`))) {
@@ -183,7 +296,13 @@ export async function insightsPayload(ref = new Date()) {
   const recurring = (await findRecurring(ref)).map(r => ({ name: r.name, valor: r.last, anterior: r.prev, subiu: r.increased }));
   const g = await goalStatus(ref);
   const today = new Date();
+  const plan = month === ym(today) ? await debtPlan(ref) : null;
   return {
+    negativo: plan ? {
+      saldoContas: -plan.divida, jurosEstimadosMes: plan.jurosMes, taxaMes: plan.taxa,
+      prazoMeses: plan.meses, parcelaNecessaria: plan.parcela, sobraMediaMensal: plan.sobraMedia,
+      corteNecessarioMes: plan.corteNecessario,
+    } : null,
     mes: month,
     diaAtual: month === ym(today) ? today.getDate() : null,
     diasNoMes: new Date(ref.getFullYear(), ref.getMonth() + 1, 0).getDate(),
