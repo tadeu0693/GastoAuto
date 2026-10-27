@@ -1,0 +1,200 @@
+10-27 11:03:40.350   522   548 E PackageManager: java.util.concurrent.TimeoutException: [Optimistic Bind] Didn't bind to resolver in time!
+10-27 11:03:40.665  1626  2600 W AiAiAutofill: java.lang.SecurityException: caller is not user's Augmented Autofill Service
+10-27 11:03:41.084  1405  3669 I NearbyDiscovery: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:41.191  1616  2300 W ModernMediaScanner: android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+10-27 11:03:41.397  3788  3830 I ReactNativeJS: Running "main"
+10-27 11:03:41.413  1405  3073 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:41.526  1405  3073 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:42.283  1438  3636 W libc    : Access denied finding property "ro.hardware.chipname"
+10-27 11:03:42.320  1405  3669 I NearbyDiscovery: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:42.432  1666  1666 E VS.BluetoothShim: java.lang.NoSuchMethodException: android.bluetooth.BluetoothHeadset.startScoUsingVirtualVoiceCall [class android.bluetooth.BluetoothDevice]
+10-27 11:03:42.757  1711  2250 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:03:42.934  3402  3447 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-27 11:03:42.934  3402  3447 W libc    : Access denied finding property "service.adb.tls.port"
+10-27 11:03:43.372  1438  3474 W GCM-GMS : Failed to get direct boot token: java.io.IOException: AUTHENTICATION_FAILED
+10-27 11:03:43.374  1438  3472 W GCM-GMS : Failed to get registration: java.io.IOException: AUTHENTICATION_FAILED
+10-27 11:03:43.380  1438  3520 E constellation: java.io.IOException: AUTHENTICATION_FAILED
+10-27 11:03:43.458  1438  3397 E GmscoreIpa: java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/apps_3p_corpus_component_names.txt: open failed: ENOENT (No such file or directory)
+10-27 11:03:43.458  1438  3397 E GmscoreIpa: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:03:43.694  1405  3200 E dlpn    : RuntimeException while executing runnable dlqc{qze@ad77270} with executor MoreExecutors.directExecutor()
+10-27 11:03:43.694  1405  3200 E dlpn    : java.lang.NullPointerException: Attempt to get length of null array
+10-27 11:03:44.309  1405  2387 W SemanticLocation: java.util.concurrent.TimeoutException: Waited 5000 milliseconds (plus 159047 nanoseconds delay) for dlnx@6c0082a[status=PENDING, info=[function=[bzrs@cbc761b]]]
+10-27 11:03:44.383  1438  3474 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:44.421  1438  3474 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:44.454  1405  3200 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:44.475  1405  3200 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:44.581  1405  3669 I NearbyDiscovery: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:46.028   835  4191 W RingtonePlayer: java.io.IOException: setDataSource failed.: status=0x80000000
+10-27 11:03:46.068  1405  3669 I NearbyDiscovery: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:46.088  3970  4092 E PhenotypeFlagCommitter: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:46.428  1405  1962 E bwel    : java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:46.624  3402  3448 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-27 11:03:46.634  3402  3448 W libc    : Access denied finding property "service.adb.tls.port"
+10-27 11:03:47.397  1405  3406 I SemanticLocation: java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/default_model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+10-27 11:03:47.397  1405  3406 I SemanticLocation: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:03:47.414  1405  3406 I SemanticLocation: java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+10-27 11:03:47.414  1405  3406 I SemanticLocation: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:03:47.548  1405  3406 I SemanticLocation: java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+10-27 11:03:47.548  1405  3406 I SemanticLocation: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:03:47.669  3402  3647 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-27 11:03:47.669  3402  3647 W libc    : Access denied finding property "service.adb.tls.port"
+10-27 11:03:48.450  3402  3444 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-27 11:03:48.475  3402  3444 W libc    : Access denied finding property "service.adb.tls.port"
+10-27 11:03:48.744  1405  3054 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:48.799  1405  3054 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:48.865  3402  3647 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-27 11:03:48.872  1405  3054 W GLSUser : [AppCertManager] Exception while requesting key: 
+10-27 11:03:48.872  1405  3054 W GLSUser : java.io.IOException: Invalid device key response.
+10-27 11:03:48.884  3402  3647 W libc    : Access denied finding property "service.adb.tls.port"
+10-27 11:03:49.233  1438  3635 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:49.266  1438  3635 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:49.682  3402  3647 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-27 11:03:49.687  3402  3647 W libc    : Access denied finding property "service.adb.tls.port"
+10-27 11:03:49.994  1438  3519 W PhenotypeRegOp: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:50.197  1616  2300 W ModernMediaScanner: android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+10-27 11:03:50.197  1616  2300 W ModernMediaScanner: android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+10-27 11:03:51.194  3402  3647 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-27 11:03:51.222  3402  3647 W libc    : Access denied finding property "service.adb.tls.port"
+10-27 11:03:51.246  1438  3360 E enyj    : java.lang.RuntimeException: ManagedChannel allocation site
+10-27 11:03:51.246  1438  3360 E enyj    : java.lang.RuntimeException: ManagedChannel allocation site
+10-27 11:03:51.268   522   897 W FileUtils: android.system.ErrnoException: chmod failed: ENOENT (No such file or directory)
+10-27 11:03:51.316  1438  3519 W libc    : Access denied finding property "ro.hardware.chipname"
+10-27 11:03:51.669  1438  3519 W PeoplePU: java.lang.IllegalArgumentException: Unknown component: ComponentInfo{com.google.android.syncadapters.contacts/com.google.android.syncadapters.contacts.ProxyGalProvider}
+10-27 11:03:51.669  1438  3519 W PeoplePU: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3061)
+10-27 11:03:51.669  1438  3519 W PeoplePU: 	at android.os.Parcel.createException(Parcel.java:3041)
+10-27 11:03:51.669  1438  3519 W PeoplePU: 	at android.os.Parcel.readException(Parcel.java:3024)
+10-27 11:03:51.669  1438  3519 W PeoplePU: 	at android.os.Parcel.readException(Parcel.java:2966)
+10-27 11:03:51.669  1438  3519 W PeoplePU: Caused by: android.os.RemoteException: Remote stack trace:
+10-27 11:03:51.696  1438  1933 W PeoplePU: android.content.pm.PackageManager$NameNotFoundException: ComponentInfo{com.google.android.gms/com.google.android.gms.people.sync.focus.ContactsSyncAdapterService}
+10-27 11:03:52.174  1438  4248 E PhenotypeFlagCommitter: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:52.292  1438  3635 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:52.320  1438  3635 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:52.382  1405  3720 I SemanticLocation: java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+10-27 11:03:52.382  1405  3720 I SemanticLocation: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:03:52.467  1405  3200 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:52.469  1405  3720 I SemanticLocation: java.io.FileNotFoundException: /data/user/0/com.google.android.gms/files/model_bundle_metadata.pb: open failed: ENOENT (No such file or directory)
+10-27 11:03:52.469  1405  3720 I SemanticLocation: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:03:52.521  1405  3200 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:03:53.205  3402  3448 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+10-27 11:03:53.205  3402  3448 W libc    : Access denied finding property "service.adb.tls.port"
+10-27 11:03:53.454  1438  4315 E PhenotypeFlagCommitter: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:03:54.966  1711  2297 E cr_CronetUrlRequestContext: Exception in upload method
+10-27 11:03:55.188  1616  2300 W ModernMediaScanner: android.database.sqlite.SQLiteConstraintException: UNIQUE constraint failed: files._data (code 2067 SQLITE_CONSTRAINT_UNIQUE)
+10-27 11:03:55.359  1616  1941 W MediaProvider: java.io.IOException: Failed to update quota type for /storage/emulated/0/Android
+10-27 11:03:55.370  1616  1941 W MediaProvider: java.io.IOException: Failed to update quota type for /storage/emulated/0/Android/media
+10-27 11:03:58.869  1405  1468 W AsyncOperation: OperationException[Status{statusCode=Stale snapshot for com.google.android.googlequicksearchbox(change count changed - expected 2  but was 1), resolution=null}]
+10-27 11:03:58.890  1711  2257 E ApplicationPropertiesBu: java.lang.NumberFormatException: For input string: "messages"
+10-27 11:03:58.910  1711  2257 W A       : Exception while fetching versionCode for package[com.google.android.apps.tv.dreamx].
+10-27 11:03:58.910  1711  2257 W A       : android.content.pm.PackageManager$NameNotFoundException: com.google.android.apps.tv.dreamx
+10-27 11:03:58.912  1711  2257 W A       : Exception while fetching versionCode for package[com.google.android.apps.tv.launcherx].
+10-27 11:03:58.912  1711  2257 W A       : android.content.pm.PackageManager$NameNotFoundException: com.google.android.apps.tv.launcherx
+10-27 11:03:58.931  1405  1460 W AsyncOperation: OperationException[Status{statusCode=Stale snapshot for com.google.android.libraries.communications.conference.device#com.google.android.gm(change count changed - expected 2  but was 0), resolution=null}]
+10-27 11:03:58.933  1405  1468 W AsyncOperation: OperationException[Status{statusCode=Stale snapshot for com.google.apps.dynamite.device#com.google.android.gm(change count changed - expected 1  but was 0), resolution=null}]
+10-27 11:03:59.407  1626  2017 W AiAiAutofill: java.lang.SecurityException: caller is not user's Augmented Autofill Service
+10-27 11:03:59.882  1711  2257 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:04:00.183  1438  3473 W Icing   : Failed to get Lockbox signed-in status: java.util.concurrent.TimeoutException: Timed out waiting for Task
+10-27 11:04:00.257  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:00.284  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:00.701  1405  1468 W AsyncOperation: OperationException[Status{statusCode=Stale snapshot for com.google.android.googlequicksearchbox(change count changed - expected 3  but was 2), resolution=null}]
+10-27 11:04:00.767   522   595 E RecoverySnapshotStorage: java.io.FileNotFoundException: /data/system/recoverablekeystore/snapshots/10131.xml: open failed: ENOENT (No such file or directory)
+10-27 11:04:00.767   522   595 E RecoverySnapshotStorage: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:04:00.856  1050  1050 E PhoneInterfaceManager: isVoNrEnabled: CommandException: com.android.internal.telephony.CommandException: REQUEST_NOT_SUPPORTED
+10-27 11:04:00.857  1050  1050 E PhoneInterfaceManager: isVoNrEnabled: CommandException: com.android.internal.telephony.CommandException: REQUEST_NOT_SUPPORTED
+10-27 11:04:00.877  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:00.962  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:00.986  1711  2255 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:04:01.308   522   821 E RecoverySnapshotStorage: java.io.FileNotFoundException: /data/system/recoverablekeystore/snapshots/10131.xml: open failed: ENOENT (No such file or directory)
+10-27 11:04:01.308   522   821 E RecoverySnapshotStorage: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:04:01.313  1438  4439 W RecoverableKeyStoreGms: [WrappingKeyManager] InternalRecoveryServiceException during wrapping key generation [CONTEXT service_id=172 ]
+10-27 11:04:01.313  1438  4439 W RecoverableKeyStoreGms: android.security.keystore.recovery.InternalRecoveryServiceException: Failed to import secret key.
+10-27 11:04:01.313  1438  4439 W RecoverableKeyStoreGms: 	at android.security.keystore.recovery.RecoveryController.wrapUnexpectedServiceSpecificException(RecoveryController.java:783)
+10-27 11:04:01.313  1438  4439 W RecoverableKeyStoreGms: Caused by: android.os.ServiceSpecificException: Failed to import secret key. (code 22)
+10-27 11:04:01.313  1438  4439 W RecoverableKeyStoreGms: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3071)
+10-27 11:04:01.313  1438  4439 W RecoverableKeyStoreGms: 	at android.os.Parcel.createException(Parcel.java:3041)
+10-27 11:04:01.313  1438  4439 W RecoverableKeyStoreGms: 	at android.os.Parcel.readException(Parcel.java:3024)
+10-27 11:04:01.313  1438  4439 W RecoverableKeyStoreGms: 	at android.os.Parcel.readException(Parcel.java:2966)
+10-27 11:04:01.344  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:01.346  1052  1075 E HardwareInfoFeatureProviderImpl: java.lang.NumberFormatException: For input string: "E"
+10-27 11:04:01.348  1052  1075 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+10-27 11:04:01.362  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:01.365  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:01.938  1405  4413 W AsyncOperation: OperationException[Status{statusCode=Stale snapshot for com.google.android.googlequicksearchbox(change count changed - expected 4  but was 3), resolution=null}]
+10-27 11:04:02.100  1711  2250 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:04:02.101  4521  4582 E IndexablesProvider: java.lang.IllegalStateException: We should initialize FormFactorUtils before getting instance.
+10-27 11:04:02.591   522  2342 E RecoverySnapshotStorage: java.io.FileNotFoundException: /data/system/recoverablekeystore/snapshots/10131.xml: open failed: ENOENT (No such file or directory)
+10-27 11:04:02.591   522  2342 E RecoverySnapshotStorage: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:04:02.612  1438  4406 W RecoverableKeyStoreGms: [WrappingKeyManager] InternalRecoveryServiceException during wrapping key generation [CONTEXT service_id=172 ]
+10-27 11:04:02.612  1438  4406 W RecoverableKeyStoreGms: android.security.keystore.recovery.InternalRecoveryServiceException: Failed to import secret key.
+10-27 11:04:02.612  1438  4406 W RecoverableKeyStoreGms: 	at android.security.keystore.recovery.RecoveryController.wrapUnexpectedServiceSpecificException(RecoveryController.java:783)
+10-27 11:04:02.612  1438  4406 W RecoverableKeyStoreGms: Caused by: android.os.ServiceSpecificException: Failed to import secret key. (code 22)
+10-27 11:04:02.612  1438  4406 W RecoverableKeyStoreGms: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3071)
+10-27 11:04:02.612  1438  4406 W RecoverableKeyStoreGms: 	at android.os.Parcel.createException(Parcel.java:3041)
+10-27 11:04:02.612  1438  4406 W RecoverableKeyStoreGms: 	at android.os.Parcel.readException(Parcel.java:3024)
+10-27 11:04:02.612  1438  4406 W RecoverableKeyStoreGms: 	at android.os.Parcel.readException(Parcel.java:2966)
+10-27 11:04:02.744  4513  4640 W BugleRcs: android.content.pm.PackageManager$NameNotFoundException: com.google.android.ims
+10-27 11:04:02.791   522  1899 E AppOps  : java.lang.SecurityException: Specified package "android" under uid 10181 but it is not
+10-27 11:04:02.791   522  1899 E AppOps  : java.lang.SecurityException: Specified package "android" under uid 10181 but it is not
+10-27 11:04:02.792   522  1899 E AppOps  : java.lang.SecurityException: Specified package "android" under uid 10181 but it is not
+10-27 11:04:02.792   522  1899 E AppOps  : java.lang.SecurityException: Specified package "android" under uid 10181 but it is not
+10-27 11:04:03.293  1405  2665 W AsyncOperation: OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.dtdi#com.google.android.gms(change count changed - expected 1  but was 0), resolution=null}]
+10-27 11:04:03.295  1405  2665 W AsyncOperation: OperationException[Status{statusCode=Stale snapshot for com.google.android.gms.personalsafety(change count changed - expected 1  but was 0), resolution=null}]
+10-27 11:04:03.303  1405  1964 W NetworkScheduler: java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
+10-27 11:04:03.324  1405  1964 W NetworkScheduler: java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
+10-27 11:04:03.485   522  1708 E RecoverySnapshotStorage: java.io.FileNotFoundException: /data/system/recoverablekeystore/snapshots/10131.xml: open failed: ENOENT (No such file or directory)
+10-27 11:04:03.485   522  1708 E RecoverySnapshotStorage: Caused by: android.system.ErrnoException: open failed: ENOENT (No such file or directory)
+10-27 11:04:03.493  1438  4439 W RecoverableKeyStoreGms: [WrappingKeyManager] InternalRecoveryServiceException during wrapping key generation [CONTEXT service_id=172 ]
+10-27 11:04:03.493  1438  4439 W RecoverableKeyStoreGms: android.security.keystore.recovery.InternalRecoveryServiceException: Failed to import secret key.
+10-27 11:04:03.493  1438  4439 W RecoverableKeyStoreGms: 	at android.security.keystore.recovery.RecoveryController.wrapUnexpectedServiceSpecificException(RecoveryController.java:783)
+10-27 11:04:03.493  1438  4439 W RecoverableKeyStoreGms: Caused by: android.os.ServiceSpecificException: Failed to import secret key. (code 22)
+10-27 11:04:03.493  1438  4439 W RecoverableKeyStoreGms: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3071)
+10-27 11:04:03.493  1438  4439 W RecoverableKeyStoreGms: 	at android.os.Parcel.createException(Parcel.java:3041)
+10-27 11:04:03.493  1438  4439 W RecoverableKeyStoreGms: 	at android.os.Parcel.readException(Parcel.java:3024)
+10-27 11:04:03.493  1438  4439 W RecoverableKeyStoreGms: 	at android.os.Parcel.readException(Parcel.java:2966)
+10-27 11:04:03.931  1405  4442 E enyj    : java.lang.RuntimeException: ManagedChannel allocation site
+10-27 11:04:03.970  1438  4458 W GmsPipelineLogger: java.lang.NullPointerException
+10-27 11:04:03.976  1405  3200 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:04:04.088  1405  1456 W NetworkScheduler: java.lang.IllegalArgumentException: Only the following extra parameter types are supported: Integer, Long, Double, String, Boolean, and nested Bundles with the same restrictions.
+10-27 11:04:04.132  1405  3200 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+10-27 11:04:04.403  1711  2250 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:04:04.571  4513  4640 W RcsClientLib: java.lang.IllegalStateException: JibeService Not Initialized
+10-27 11:04:04.571  4513  4640 W RcsClientLib: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3065)
+10-27 11:04:04.571  4513  4640 W RcsClientLib: 	at android.os.Parcel.createException(Parcel.java:3041)
+10-27 11:04:04.571  4513  4640 W RcsClientLib: 	at android.os.Parcel.readException(Parcel.java:3024)
+10-27 11:04:04.571  4513  4640 W RcsClientLib: 	at android.os.Parcel.readException(Parcel.java:2966)
+10-27 11:04:04.571  4513  4640 W RcsClientLib: 	at com.google.android.aidl.BaseProxy.transactAndReadExceptionReturnVoid(PG:3)
+10-27 11:04:05.075  4513  4616 W RcsClientLib: java.lang.IllegalStateException: JibeService Not Initialized
+10-27 11:04:05.075  4513  4616 W RcsClientLib: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3065)
+10-27 11:04:05.075  4513  4616 W RcsClientLib: 	at android.os.Parcel.createException(Parcel.java:3041)
+10-27 11:04:05.075  4513  4616 W RcsClientLib: 	at android.os.Parcel.readException(Parcel.java:3024)
+10-27 11:04:05.075  4513  4616 W RcsClientLib: 	at android.os.Parcel.readException(Parcel.java:2966)
+10-27 11:04:05.075  4513  4616 W RcsClientLib: 	at com.google.android.aidl.BaseProxy.transactAndReadExceptionReturnVoid(PG:3)
+10-27 11:04:05.465  1711  2256 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:04:05.879  1711  2250 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:04:06.083  4684  4684 E BugleRcsEngine: [2] JibeService.onDestroy: JibeService: onDestroy() unregister factory exception: java.lang.IllegalArgumentException: Receiver not registered: com.google.android.ims.receiver.sip.DebugOptionsReceiver@87780b9
+10-27 11:04:06.181  1711  2250 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:04:06.269  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.270  1052  4468 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.274  1052  4468 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.281  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.307  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.365  1052  4468 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.367  1052  1083 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.385  1052  1083 W SliceDataConverter: java.lang.IllegalStateException: Invalid preference controller: com.android.settings.network.NetworkProviderSimsCategoryController
+10-27 11:04:06.385  1052  1083 W SliceDataConverter: Caused by: java.lang.NoSuchMethodException: com.android.settings.network.NetworkProviderSimsCategoryController.<init> [class android.content.Context, class java.lang.String]
+10-27 11:04:06.418  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.421  1052  4468 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.435  1052  1083 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.437  1711  2256 W CorpusConfigHelper: android.util.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 123 column 2
+10-27 11:04:06.464  1052  1083 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: ethernet
+10-27 11:04:06.480  1052  1075 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.481   522   522 E JobServiceContext: android.os.DeadObjectException
+10-27 11:04:06.619  1052  1083 W SliceDataConverter: java.lang.IllegalStateException: Invalid preference controller: com.android.settings.accessibility.VibrationMainSwitchPreferenceController
+10-27 11:04:06.619  1052  1083 W SliceDataConverter: Caused by: java.lang.reflect.InvocationTargetException
+10-27 11:04:06.619  1052  1083 W SliceDataConverter: Caused by: java.lang.RuntimeException: Can't create handler inside thread Thread[binder:1052_4,5,main] that has not called Looper.prepare()
+10-27 11:04:06.646  1052  1083 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.666  1052  1083 W SliceDataConverter: java.lang.IllegalStateException: Invalid preference controller: com.android.settings.network.telephony.CallsDefaultSubscriptionController
+10-27 11:04:06.666  1052  1083 W SliceDataConverter: Caused by: java.lang.NoSuchMethodException: com.android.settings.network.telephony.CallsDefaultSubscriptionController.<init> [class android.content.Context, class java.lang.String]
+10-27 11:04:06.706  1052  4468 W libc    : Access denied finding property "ro.vendor.aware_available"
+10-27 11:04:06.896  1626  2017 E AmbientMusicServiceMana: oxe: java.lang.reflect.InvocationTargetException
+10-27 11:04:06.896  1626  2017 E AmbientMusicServiceMana: Caused by: java.lang.reflect.InvocationTargetException
+10-27 11:04:06.896  1626  2017 E AmbientMusicServiceMana: Caused by: java.lang.IllegalStateException: No underlying SoundTriggerModule available

@@ -1,0 +1,7 @@
+Starting: Intent { cmp=com.tadeu.gastoauto/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: com.tadeu.gastoauto/.MainActivity
+TotalTime: 1028
+WaitTime: 1039
+Complete

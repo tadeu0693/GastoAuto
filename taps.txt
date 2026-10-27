@@ -1,0 +1,3 @@
+tap 'Economia' -> 199 616
+tap 'Ajustes' -> 
+tap 'Conectar conta' -> 

@@ -1,0 +1,1 @@
+    topResumedActivity=ActivityRecord{6555716 u0 com.tadeu.gastoauto/.MainActivity t8}
